@@ -1,0 +1,7 @@
+*.o
+*.so
+*.out
+*.tmp
+*.log
+build/
+foo.*

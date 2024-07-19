@@ -1,0 +1,9 @@
+rule_1:
+      fizz buzz
+    | foo
+    ;
+
+rule_2:
+      rule_1 buzz
+    | foo fizz
+    ;
