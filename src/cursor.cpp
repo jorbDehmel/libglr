@@ -96,6 +96,23 @@ std::set<Cursor> Cursor::next_cursors(
 
 bool Cursor::is_valid_end() const noexcept
 {
-    return (history.back().first->type == RETURN &&
-            call_stack.empty());
+    // Ensure that current node is a return node
+    if (history.back().first->type != RETURN)
+    {
+        return false;
+    }
+
+    // Ensure that only returns remain on the call stack
+    auto cs_copy = call_stack;
+    while (!cs_copy.empty())
+    {
+        auto top = cs_copy.top();
+        cs_copy.pop();
+
+        if (top->type != RETURN)
+        {
+            return false;
+        }
+    }
+    return true;
 }

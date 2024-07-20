@@ -104,3 +104,6 @@ class GrammarGraph
         return n;
     }
 };
+
+void graphviz(const std::string &,
+              const std::set<ParseNode *> &, ParseNode *const);

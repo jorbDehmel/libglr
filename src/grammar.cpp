@@ -8,20 +8,22 @@
 GrammarGraph::GrammarGraph(const Grammar &_g)
 {
     std::map<std::string, ParseNode *> rule_handles;
+    std::string contents;
 
     // Build each rule
     for (const auto &_r : _g.rules)
     {
-        auto name = _r.first;
-        auto rule = _r.second;
+        const auto name = _r.first;
+        const auto rule = _r.second;
 
-        rule_handles[name] = new_node();
-        auto cur_end = rule_handles[name];
+        const auto root = new_node();
+
+        rule_handles[name] = root;
+        auto cur_end = root;
 
         // Write rule from beginning to end
         for (auto node : rule)
         {
-            std::string contents;
             if (node.is_rule_name(contents))
             {
                 if (!rule_handles.contains(contents))
@@ -30,21 +32,22 @@ GrammarGraph::GrammarGraph(const Grammar &_g)
                         "Unknown rule '{}'", contents));
                 }
 
-                auto n = new_node();
+                const auto n = new_node();
                 cur_end->set_entry_exit_points(
-                    rule_handles[contents], n);
+                    rule_handles.at(contents), n);
                 cur_end = n;
             }
             else if (node.is_terminal(contents))
             {
-                auto n = new_node();
-                cur_end->set_transitions(
+                const auto n = new_node();
+                cur_end->merge_transitions(
                     {{boost::regex(contents), n}});
                 cur_end = n;
             }
             else if (node.is_disjunction())
             {
-                cur_end = rule_handles[name];
+                cur_end->set_as_return();
+                cur_end = root;
             }
             else
             {
@@ -52,6 +55,9 @@ GrammarGraph::GrammarGraph(const Grammar &_g)
                     "Unknown rulenode type.");
             }
         }
+
+        // Append return node
+        cur_end->set_as_return();
     }
 
     // Set entrance rule
@@ -68,6 +74,13 @@ GrammarGraph::~GrammarGraph()
 }
 
 void GrammarGraph::graphviz(const std::string &_filepath) const
+{
+    ::graphviz(_filepath, nodes, entry);
+}
+
+void graphviz(const std::string &_filepath,
+              const std::set<ParseNode *> &nodes,
+              ParseNode *const entry)
 {
     // Open file
     std::ofstream f(_filepath);
@@ -119,10 +132,10 @@ void GrammarGraph::graphviz(const std::string &_filepath) const
         {
             f << '\t' << ids[node] << " -> "
               << ids[node->get_entry_point()]
-              << " label=\"CALL\";\n"
+              << " [label=\"CALL\"];\n"
               << '\t' << ids[node] << " -> "
               << ids[node->get_exit_point()]
-              << " label=\"ON RETURN\";\n";
+              << " [label=\"ON RETURN\"];\n";
         }
     }
     f << "\tENTRY -> " << ids[entry] << ";\n";

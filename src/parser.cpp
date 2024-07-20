@@ -59,3 +59,14 @@ Cursor Parser::finalize()
 
     return out;
 }
+
+void Parser::graphviz(
+    const std::string &_filepath) const noexcept
+{
+    g.graphviz(_filepath);
+}
+
+int Parser::n_viable() const noexcept
+{
+    return cursors.size();
+}

@@ -5,7 +5,6 @@ Tests the Grammar class.
 #include "../src/cursor.hpp"
 #include "../src/grammar.hpp"
 #include "../src/lexer.hpp"
-#include "../src/load_grammar.hpp"
 #include <iostream>
 
 bool does_traverse(const std::list<std::string> &_input,
@@ -22,9 +21,9 @@ bool does_traverse(const std::list<std::string> &_input,
             new_cursors.merge(cursor.next_cursors(s));
         }
 
-        std::cout << "After input " << s << ", there are "
-                  << new_cursors.size()
-                  << " viable parse paths.\n";
+        // std::cout << "After input " << s << ", there are "
+        //           << new_cursors.size()
+        //           << " viable parse paths.\n";
 
         cursors = new_cursors;
     }
@@ -48,11 +47,16 @@ int main()
     std::list<std::string> input;
 
     // Load grammar
-    load_grammar("input/grammar.txt", l, g);
+    g.rules["main"] = {RuleNode(RuleNode::TERMINAL, "fizz"),
+                       RuleNode(RuleNode::TERMINAL, "buzz"),
+                       RuleNode(RuleNode::DISJUNCTION, "|"),
+                       RuleNode(RuleNode::TERMINAL, "foo")};
+    g.entry_rule = "main";
 
     // Compile loaded grammar
     GrammarGraph gg(g);
-    gg.graphviz("foo.dot");
+    gg.graphviz("test_grammar.dot");
+    system("dot -Tpng test_grammar.dot -o test_grammar.png");
 
     // Initiate lexer with input file
     l.init_file("input/to_parse.txt");

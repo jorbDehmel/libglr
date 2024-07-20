@@ -3,6 +3,7 @@ Tests the Cursor class.
 */
 
 #include "../src/cursor.hpp"
+#include "../src/grammar.hpp"
 #include <iostream>
 
 void traverse(std::list<std::string> &_input,
@@ -56,6 +57,11 @@ int main()
 
     e.set_transitions({{boost::regex("bloop"), &f}});
     f.set_as_return();
+    g.set_as_return();
+
+    graphviz("test_cursor.dot", {&a, &b, &c, &d, &e, &f, &g},
+             &a);
+    system("dot -Tpng test_cursor.dot -o test_cursor.png");
 
     std::list<std::string> input;
     std::set<Cursor> cursors;

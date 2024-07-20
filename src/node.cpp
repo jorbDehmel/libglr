@@ -18,6 +18,17 @@ void ParseNode::set_transitions(
     transitions = _transitions;
 }
 
+void ParseNode::merge_transitions(
+    const std::list<std::pair<boost::regex, ParseNode *>>
+        &_transitions) noexcept
+{
+    type = NORMAL;
+    for (const auto &p : _transitions)
+    {
+        transitions.push_back(p);
+    }
+}
+
 void ParseNode::set_as_return() noexcept
 {
     type = RETURN;

@@ -32,7 +32,11 @@ class Parser
 
     void reset();
     void process_token(const Token &_what);
+
+    int n_viable() const noexcept;
     Cursor finalize();
+
+    void graphviz(const std::string &_filepath) const noexcept;
 
   protected:
     const GrammarGraph g;

@@ -24,3 +24,7 @@ run:	build
 
 $(OBJS):	$(HEADS) $(TARGETS:%=../src/%.cpp)
 	$(MAKE) -C ..
+
+.PHONY:	clean
+clean:
+	rm -f *.dot *.out *.png

@@ -36,6 +36,9 @@ class ParseNode
     void set_transitions(
         const std::list<std::pair<boost::regex, ParseNode *>>
             &) noexcept;
+    void merge_transitions(
+        const std::list<std::pair<boost::regex, ParseNode *>>
+            &) noexcept;
     void set_as_return() noexcept;
 
     ParseNode *const get_entry_point();

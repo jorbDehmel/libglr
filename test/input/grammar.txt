@@ -1,9 +1,8 @@
-rule_1:
-      fizz buzz
-    | foo
+BLIZZ_BOP:
+      blizz bop
     ;
 
-rule_2:
-      rule_1 buzz
-    | foo fizz
+MAIN:
+      fizz foo bloop
+    | fizz BLIZZ_BOP
     ;
