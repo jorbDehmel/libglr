@@ -8,9 +8,14 @@ Defines the lexer class.
 #include <stack>
 #include <string>
 
+/*
+A DFA-based lexer.
+*/
 class Lexer
 {
   public:
+    ~Lexer();
+
     // If true, only fetches non-whitespace tokens.
     bool ignore_whitespace = true;
 

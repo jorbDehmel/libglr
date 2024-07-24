@@ -6,20 +6,20 @@ Implementations for the parser class.
 #include "cursor.hpp"
 #include <stdexcept>
 
-Parser::Parser(const Grammar &_grammar)
+Parser::Parser(const Grammar &_grammar) noexcept
     : g(_grammar), cursors({Cursor(g.get_entry())})
 {
     cursors.clear();
     cursors.insert(Cursor(g.get_entry()));
 }
 
-void Parser::reset()
+void Parser::reset() noexcept
 {
     cursors.clear();
     cursors.insert(g.get_entry());
 }
 
-void Parser::process_token(const Token &_what)
+void Parser::process_token(const Token &_what) noexcept
 {
     std::set<Cursor> new_cursors;
     for (auto &c : cursors)
@@ -29,12 +29,6 @@ void Parser::process_token(const Token &_what)
 
     cursors.clear();
     cursors = new_cursors;
-
-    if (cursors.empty())
-    {
-        throw std::runtime_error(
-            "Text does not match grammar.");
-    }
 }
 
 Cursor Parser::finalize()

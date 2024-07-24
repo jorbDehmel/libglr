@@ -12,6 +12,11 @@ parse graph.
 #include <set>
 #include <string>
 
+/*
+A single node in an uncompiled grammar. This can be a terminal /
+literal, a rule name, or a disjunction operator. This generally
+follows EBNF.
+*/
 class RuleNode
 {
   public:
@@ -56,6 +61,10 @@ class RuleNode
     Type type;
     std::string data;
 };
+
+/*
+A rule in an uncompiled grammar; Simply a list of rule nodes.
+*/
 typedef std::list<RuleNode> Rule;
 
 /*
@@ -74,11 +83,13 @@ differently.
 class Grammar
 {
   public:
-    std::string entry_rule;
+    std::string entry_rule = "MAIN";
     std::map<std::string, Rule> rules;
 };
 
-// A compiled grammar. Note: Takes ownership of its nodes.
+/*
+A compiled grammar. Note: Takes ownership of its nodes.
+*/
 class GrammarGraph
 {
   public:
@@ -105,5 +116,9 @@ class GrammarGraph
     }
 };
 
+/*
+Save a graphviz (*.dot) representation of the given compiled
+parse graph.
+*/
 void graphviz(const std::string &,
               const std::set<ParseNode *> &, ParseNode *const);

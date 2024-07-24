@@ -20,6 +20,9 @@ If a cursor has no valid moves, it dies.
 
 #include <boost/regex.hpp>
 
+/*
+Represents the possible types of a given node in a parse graph.
+*/
 enum ParseNodeType
 {
     NORMAL,
@@ -27,7 +30,10 @@ enum ParseNodeType
     RETURN
 };
 
-// Does NOT take ownership of its links!
+/*
+A single node in a parse graph. This can be a normal node, a
+call node, or a return node.
+*/
 class ParseNode
 {
   public:
@@ -52,4 +58,5 @@ class ParseNode
     // The data of this node
     std::list<std::pair<boost::regex, ParseNode *>> transitions;
     ParseNode *entry_point, *exit_point;
+    std::string rule_name;
 };

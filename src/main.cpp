@@ -2,6 +2,7 @@
 Basic CLI frontend for parser testing.
 */
 
+#include "cursor.hpp"
 #include "lexer.hpp"
 #include "load_grammar.hpp"
 #include "parser.hpp"
@@ -22,35 +23,50 @@ int main(int c, char *v[])
     // Grab input filename and grammar file name
     const std::string source_path = v[1];
     const std::string grammar_path = v[2];
-
-    // Load lexer and grammar objects
     Lexer l;
-    Grammar g;
-    load_grammar(grammar_path, l, g);
 
-    // Create parser object
+    // Load grammar
+    Grammar g = load_grammar_file(grammar_path);
+
+    // Create parser
     Parser p(g);
 
     // Initialize lexer on source file
     l.init_file(source_path);
 
-    try
+    // Feed from lexer to parser
+    while (!l.done())
     {
-        // Feed from lexer to parser
-        while (!l.done())
+        Token t = l.next_token();
+        if (t.str.empty())
         {
-            Token t = l.next_token();
-            p.process_token(t);
+            break;
         }
 
-        // Get final parse tree
-        Cursor parse_tree = p.finalize();
+        p.process_token(t);
+    }
+
+    try
+    {
+        // Get final parse path
+        Cursor c = p.finalize();
+
+        for (const auto &h : c.history)
+        {
+            std::cout << "In rule '" << h.first->rule_name
+                      << "' at " << h.second.file << ":"
+                      << h.second.line << "." << h.second.col
+                      << " token: '" << h.second.str << "'\n";
+        }
     }
     catch (std::runtime_error &e)
     {
         std::cerr << e.what() << '\n';
         return 2;
     }
+
+    std::cout << source_path << " matches grammar "
+              << grammar_path << '\n';
 
     return 0;
 }

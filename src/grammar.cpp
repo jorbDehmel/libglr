@@ -10,15 +10,22 @@ GrammarGraph::GrammarGraph(const Grammar &_g)
     std::map<std::string, ParseNode *> rule_handles;
     std::string contents;
 
+    // Create roots (allows forward definitions)
+    for (const auto &_r : _g.rules)
+    {
+        const auto name = _r.first;
+        const auto root = new_node();
+
+        root->rule_name = name;
+        rule_handles[name] = root;
+    }
+
     // Build each rule
     for (const auto &_r : _g.rules)
     {
         const auto name = _r.first;
         const auto rule = _r.second;
-
-        const auto root = new_node();
-
-        rule_handles[name] = root;
+        auto root = rule_handles[name];
         auto cur_end = root;
 
         // Write rule from beginning to end
@@ -33,6 +40,8 @@ GrammarGraph::GrammarGraph(const Grammar &_g)
                 }
 
                 const auto n = new_node();
+                n->rule_name = name;
+
                 cur_end->set_entry_exit_points(
                     rule_handles.at(contents), n);
                 cur_end = n;
@@ -40,6 +49,8 @@ GrammarGraph::GrammarGraph(const Grammar &_g)
             else if (node.is_terminal(contents))
             {
                 const auto n = new_node();
+                n->rule_name = name;
+
                 cur_end->merge_transitions(
                     {{boost::regex(contents), n}});
                 cur_end = n;
@@ -48,11 +59,6 @@ GrammarGraph::GrammarGraph(const Grammar &_g)
             {
                 cur_end->set_as_return();
                 cur_end = root;
-            }
-            else
-            {
-                throw std::runtime_error(
-                    "Unknown rulenode type.");
             }
         }
 

@@ -1,8 +1,8 @@
 BLIZZ_BOP:
-      blizz bop
+      "blizz" "bop"
     ;
 
 MAIN:
-      fizz foo bloop
-    | fizz BLIZZ_BOP
+      "fizz" "foo" "bloop"
+    | "fizz" BLIZZ_BOP
     ;

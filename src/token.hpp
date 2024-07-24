@@ -7,6 +7,11 @@ A token class for parsing.
 #include <cstdint>
 #include <string>
 
+/*
+A single item yielded by a lexer. This contains some information
+about its origin, namely the file, column and line positions,
+and text.
+*/
 class Token
 {
   public:

@@ -1,5 +1,7 @@
 /*
-I think this is technically recursive descent?
+This is a GLR (Generalized LR) parser, meaning it can handle a
+large class of (possibly conflicting) grammars, at the cost of
+a higher worst-case time complexity (O(n^3)).
 
 Outlines a parser class. This will contain an object
 representing a compiled grammar as a graph. A series of cursors
@@ -25,13 +27,16 @@ This software was created as a creative exercise.
 #include "token.hpp"
 #include <set>
 
+/*
+A GLR parser class.
+*/
 class Parser
 {
   public:
-    Parser(const Grammar &_grammar);
+    Parser(const Grammar &_grammar) noexcept;
 
-    void reset();
-    void process_token(const Token &_what);
+    void reset() noexcept;
+    void process_token(const Token &_what) noexcept;
 
     int n_viable() const noexcept;
     Cursor finalize();

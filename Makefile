@@ -4,8 +4,7 @@ CC := g++ -g -O3 -std=c++20
 CFLAGS := -pedantic -Wall
 LFLAGS := -pedantic -Wall
 OBJS := build/cursor.o build/grammar.o build/node.o \
-	build/parser.o build/token.o build/lexer.o \
-	build/load_grammar.o
+	build/parser.o build/lexer.o build/load_grammar.o
 HEADS := src/cursor.hpp src/grammar.hpp src/node.hpp \
 	src/parser.hpp src/token.hpp src/lexer.hpp \
 	src/load_grammar.hpp
@@ -33,4 +32,4 @@ format:
 
 .PHONY:	clean
 clean:
-	rm -rf build
+	rm -rf build $(TARGETS)

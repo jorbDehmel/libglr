@@ -31,7 +31,7 @@ int main()
     Grammar g;
     Lexer l;
 
-    load_grammar("input/grammar.txt", l, g);
+    g = load_grammar_file("input/grammar.txt");
     g.entry_rule = "MAIN";
 
     Parser p(g);

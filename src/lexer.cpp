@@ -35,7 +35,7 @@ void initialize_dfa()
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
     const static std::string numbers = "0123456789";
     const static std::string whitespace = " \t\n";
-    const static std::string singletons = ";(){}[],?";
+    const static std::string singletons = ";(){}[],?~";
     const static std::string operators = "!@#$%^&*-+=:<>|";
 
     // Default is delim
@@ -44,30 +44,30 @@ void initialize_dfa()
     // Large blocks of characters via constants
     for (char c : alphabet)
     {
-        dfa[DELIM][c] = ALPHABETIC;
-        dfa[ALPHABETIC][c] = ALPHABETIC;
-        dfa[NUMERIC][c] = NUMERIC;
+        dfa[DELIM][(size_t)c] = ALPHABETIC;
+        dfa[ALPHABETIC][(size_t)c] = ALPHABETIC;
+        dfa[NUMERIC][(size_t)c] = NUMERIC;
     }
     for (char c : numbers)
     {
-        dfa[DELIM][c] = NUMERIC;
-        dfa[NUMERIC][c] = NUMERIC;
-        dfa[ALPHABETIC][c] = ALPHABETIC;
+        dfa[DELIM][(size_t)c] = NUMERIC;
+        dfa[NUMERIC][(size_t)c] = NUMERIC;
+        dfa[ALPHABETIC][(size_t)c] = ALPHABETIC;
     }
     for (char c : whitespace)
     {
-        dfa[DELIM][c] = WHITESPACE;
-        dfa[WHITESPACE][c] = WHITESPACE;
+        dfa[DELIM][(size_t)c] = WHITESPACE;
+        dfa[WHITESPACE][(size_t)c] = WHITESPACE;
     }
     for (char c : singletons)
     {
-        dfa[DELIM][c] = SINGLETON;
+        dfa[DELIM][(size_t)c] = SINGLETON;
     }
     for (char c : operators)
     {
-        dfa[DELIM][c] = OPERATOR;
-        dfa[OPERATOR][c] = OPERATOR;
-        dfa[SLASH][c] = OPERATOR;
+        dfa[DELIM][(size_t)c] = OPERATOR;
+        dfa[OPERATOR][(size_t)c] = OPERATOR;
+        dfa[SLASH][(size_t)c] = OPERATOR;
     }
 
     // Misc. small changes
@@ -92,10 +92,10 @@ void initialize_dfa()
     {
         if (c != '\n')
         {
-            dfa[PREPROC][c] = PREPROC;
-            dfa[COMMENT][c] = COMMENT;
-            dfa[SINGLE_QUOTE][c] = SINGLE_QUOTE;
-            dfa[DOUBLE_QUOTE][c] = DOUBLE_QUOTE;
+            dfa[PREPROC][(size_t)c] = PREPROC;
+            dfa[COMMENT][(size_t)c] = COMMENT;
+            dfa[SINGLE_QUOTE][(size_t)c] = SINGLE_QUOTE;
+            dfa[DOUBLE_QUOTE][(size_t)c] = DOUBLE_QUOTE;
         }
     }
 
@@ -107,11 +107,29 @@ void initialize_dfa()
 
 ////////////////////////////////////////////////////////////////
 
+Lexer::~Lexer()
+{
+    while (!include_stack.empty())
+    {
+        pop_state();
+    }
+
+    if (cur_state.f)
+    {
+        fclose(cur_state.f);
+    }
+}
+
 void Lexer::init_file(const std::string &_path)
 {
     if (!dfa_is_initialized)
     {
         initialize_dfa();
+    }
+
+    while (!include_stack.empty())
+    {
+        pop_state();
     }
 
     if (cur_state.f)
@@ -151,7 +169,10 @@ void Lexer::push_state_and_load(const std::string &_path)
 void Lexer::pop_state()
 {
     // Close current state
-    fclose(cur_state.f);
+    if (cur_state.f)
+    {
+        fclose(cur_state.f);
+    }
 
     // Load previous state from stack
     cur_state = include_stack.top();
@@ -162,7 +183,7 @@ Token Lexer::next_token()
 {
     // Check if need to go up an include file
     // This is mostly safety checking
-    if (feof(cur_state.f))
+    while (feof(cur_state.f))
     {
         if (include_stack.empty())
         {
@@ -199,7 +220,7 @@ Token Lexer::next_token()
                 return out;
             }
 
-            if (dfa[DELIM][c] != WHITESPACE)
+            if (dfa[DELIM][(size_t)c] != WHITESPACE)
             {
                 break;
             }
@@ -225,7 +246,7 @@ Token Lexer::next_token()
         fread(&c, 1, 1, cur_state.f);
 
         // Process in DFA
-        state = dfa[state][c];
+        state = dfa[state][(size_t)c];
 
         // If exhausted file, exit
         if (feof(cur_state.f))

@@ -1,38 +1,38 @@
-#include "load_grammar.hpp"
 #include "grammar.hpp"
+#include "lexer.hpp"
 #include "token.hpp"
 #include <format>
 #include <stdexcept>
 
-void load_grammar(const std::string &_path, Lexer &_l,
-                  Grammar &_g)
+Grammar load_grammar(const std::list<Token> &_text,
+                     const std::string &_token_filename)
 {
     std::string cur_rule;
     bool is_in_rule = false;
-    Token t;
-
-    // Lex
-    _l.init_file(_path);
+    bool should_be_colon = false;
+    Grammar g;
 
     // Interpret token stream
-    while (!_l.done())
+    for (auto it = _text.begin(); it != _text.end(); ++it)
     {
-        do
+        Token t = *it;
+
+        if (should_be_colon)
         {
-            if (t.str.starts_with("#include "))
+            if (t.str != ":")
             {
-                std::string filepath =
-                    t.str.substr(10, t.str.size() - 11);
-
-                _l.push_state_and_load(filepath);
+                throw std::runtime_error(std::format(
+                    "Unterminated rule '{}' at {}:{}.{}",
+                    cur_rule, t.file, t.line, t.col));
             }
-
-            t = _l.next_token();
-        } while (t.str.starts_with("//") ||
-                 t.str.starts_with("#"));
+            else
+            {
+                should_be_colon = false;
+            }
+        }
 
         // EOF
-        if (t.str == "")
+        else if (t.str == "")
         {
             break;
         }
@@ -43,25 +43,12 @@ void load_grammar(const std::string &_path, Lexer &_l,
             cur_rule = t.str;
             is_in_rule = true;
 
-            if (_g.entry_rule == "")
+            if (g.entry_rule == "")
             {
-                _g.entry_rule = cur_rule;
+                g.entry_rule = cur_rule;
             }
 
-            if (_l.done())
-            {
-                throw std::runtime_error(std::format(
-                    "Unterminated rule '{}' at {}:{}.{}",
-                    cur_rule, t.file, t.line, t.col));
-            }
-
-            t = _l.next_token();
-            if (t.str != ":")
-            {
-                throw std::runtime_error(std::format(
-                    "Unterminated rule '{}' at {}:{}.{}",
-                    cur_rule, t.file, t.line, t.col));
-            }
+            should_be_colon = true;
         }
 
         // End rule
@@ -73,20 +60,22 @@ void load_grammar(const std::string &_path, Lexer &_l,
         // Continue rule
         else
         {
-            if (_g.rules.contains(t.str))
+            if (t.str.size() > 2 && t.str.front() == '"' &&
+                t.str.back() == '"')
             {
-                _g.rules[cur_rule].push_back(
-                    RuleNode(RuleNode::RULE_NAME, t.str));
+                g.rules[cur_rule].push_back(RuleNode(
+                    RuleNode::TERMINAL,
+                    t.str.substr(1, t.str.size() - 2)));
             }
             else if (t.str == "|")
             {
-                _g.rules[cur_rule].push_back(
+                g.rules[cur_rule].push_back(
                     RuleNode(RuleNode::DISJUNCTION, t.str));
             }
             else
             {
-                _g.rules[cur_rule].push_back(
-                    RuleNode(RuleNode::TERMINAL, t.str));
+                g.rules[cur_rule].push_back(
+                    RuleNode(RuleNode::RULE_NAME, t.str));
             }
         }
     }
@@ -95,6 +84,39 @@ void load_grammar(const std::string &_path, Lexer &_l,
     {
         throw std::runtime_error(
             std::format("Unterminated rule '{}' at {}:{}.{}",
-                        cur_rule, t.file, t.line, t.col));
+                        cur_rule, _text.back().file,
+                        _text.back().line, _text.back().col));
     }
+
+    return g;
+}
+
+Grammar load_grammar_file(const std::string &_path)
+{
+    std::list<Token> raw_grammar;
+    Lexer l;
+    Token t;
+
+    // Lex
+    l.init_file(_path);
+    while (!l.done())
+    {
+        do
+        {
+            t = l.next_token();
+
+            if (t.str.starts_with("#include "))
+            {
+                std::string filepath =
+                    t.str.substr(10, t.str.size() - 11);
+
+                l.push_state_and_load(filepath);
+            }
+        } while (t.str.starts_with("//") ||
+                 t.str.starts_with("#"));
+
+        raw_grammar.push_back(t);
+    }
+
+    return load_grammar(raw_grammar, _path);
 }

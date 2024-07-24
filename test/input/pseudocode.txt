@@ -1,0 +1,27 @@
+MAIN:
+      STMNTS
+    ;
+
+STMNTS:
+      STMNT
+    | STMNTS STMNT
+    ;
+
+STMNT:
+      LHS BOP RHS SEMICOLON
+    | RHS SEMICOLON
+    ;
+
+LHS:
+      ID
+    | ID DOT LHS
+    ;
+
+BOP:
+    ;
+
+RHS:
+    ;
+
+ID:
+    ;

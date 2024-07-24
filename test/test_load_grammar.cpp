@@ -2,6 +2,7 @@
 Tests the load_grammar function.
 */
 
+#include "../src/lexer.hpp"
 #include "../src/load_grammar.hpp"
 #include <iostream>
 
@@ -10,7 +11,7 @@ int main()
     Grammar g;
     Lexer l;
 
-    load_grammar("input/grammar.txt", l, g);
+    g = load_grammar_file("input/grammar.txt");
 
     std::cout << "Rules:\n";
     for (auto &p : g.rules)

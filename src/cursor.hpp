@@ -12,8 +12,13 @@ node it occupies.
 #include <set>
 #include <stack>
 
+// The max number of calls before a cursor throws an error.
 const static uint64_t max_cursor_recursion_depth = 512;
 
+/*
+An object which keeps track of a history and call stack within
+a parse graph.
+*/
 class Cursor
 {
   public:

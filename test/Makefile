@@ -10,14 +10,9 @@ HEADS := $(TARGETS:%=../src/%.hpp)
 .PHONY:	build
 build:	$(EXES)
 
-.PHONY:	run
-run:	build
-	for test in $(EXES) ; do                                   \
-		./$$test ;                                             \
-	done
-
 %.out:	%.o $(OBJS)
 	$(CC) $(LFLAGS) -o $@ $^
+	./$@
 
 %.o:	%.cpp $(HEADS) Makefile
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -27,4 +22,4 @@ $(OBJS):	$(HEADS) $(TARGETS:%=../src/%.cpp)
 
 .PHONY:	clean
 clean:
-	rm -f *.dot *.out *.png
+	rm -f *.dot *.out *.png *.o

@@ -1,5 +1,8 @@
 ## Object Definitions
 
+This is a learning exercise project which defines a GLR parser
+class. This is NOT a parser generator; It is a C++ object.
+
 ### Rules
 
 A `Rule` is an alias of a list of `RuleNodes`. This represents a
