@@ -1,27 +1,25 @@
-MAIN:
-      STMNTS
-    ;
+MAIN: STMNTS ;
 
 STMNTS:
       STMNT
-    | STMNTS STMNT
+    | STMNT STMNTS
     ;
 
 STMNT:
-      LHS BOP RHS SEMICOLON
-    | RHS SEMICOLON
+      LHS "=" RHS ";"
+    | RHS ";"
     ;
 
 LHS:
       ID
-    | ID DOT LHS
-    ;
-
-BOP:
+    | ID "\." LHS
     ;
 
 RHS:
+      LHS
+    | LHS BOP RHS
     ;
 
-ID:
-    ;
+BOP:  "[-+*/^%]" ;
+
+ID:   "[a-zA-Z_][a-zA-Z0-9_]*" ;

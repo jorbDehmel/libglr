@@ -15,6 +15,13 @@ new_history(
         &_existing,
     const std::pair<ParseNode *const, Token> &_to_append)
 {
+    if (_existing.size() >= max_cursor_recursion_depth)
+    {
+        throw std::runtime_error(
+            "Cursor exceeded maximum recursion depth! "
+            "(Likely due to left recursion)");
+    }
+
     auto out = _existing;
     out.push_back(_to_append);
     return out;
@@ -57,7 +64,8 @@ std::set<Cursor> Cursor::next_cursors(
         {
             // Call node: Enter and push
 
-            if (call_stack.size() >= max_cursor_recursion_depth)
+            if (next_call_stack.size() >=
+                max_cursor_recursion_depth)
             {
                 throw std::runtime_error(
                     "Max recursion depth reached.");

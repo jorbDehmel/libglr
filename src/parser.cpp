@@ -4,6 +4,7 @@ Implementations for the parser class.
 
 #include "parser.hpp"
 #include "cursor.hpp"
+#include <algorithm>
 #include <stdexcept>
 
 Parser::Parser(const Grammar &_grammar) noexcept
@@ -33,25 +34,22 @@ void Parser::process_token(const Token &_what) noexcept
 
 Cursor Parser::finalize()
 {
-    if (cursors.size() > 1)
+    const auto viable = n_viable();
+
+    if (viable > 1)
     {
         throw std::runtime_error(
             "A single parse tree could not be produced.");
     }
-    else if (cursors.empty())
+    else if (viable == 0)
     {
         throw std::runtime_error(
             "Text does not match grammar.");
     }
 
-    const auto out = *cursors.begin();
-    if (!out.is_valid_end())
-    {
-        throw std::runtime_error(
-            "Text begins, but does not finish, grammar.");
-    }
-
-    return out;
+    return *std::find_if(
+        cursors.begin(), cursors.end(),
+        [](const Cursor &i) { return i.is_valid_end(); });
 }
 
 void Parser::graphviz(
@@ -62,5 +60,12 @@ void Parser::graphviz(
 
 int Parser::n_viable() const noexcept
 {
-    return cursors.size();
+    return std::count_if(
+        cursors.begin(), cursors.end(),
+        [](const Cursor &c) { return c.is_valid_end(); });
+}
+
+const std::set<Cursor> Parser::get_cursors() const noexcept
+{
+    return cursors;
 }

@@ -2,6 +2,8 @@
 Basic CLI frontend for parser testing.
 */
 
+#define DEBUG
+
 #include "cursor.hpp"
 #include "lexer.hpp"
 #include "load_grammar.hpp"
@@ -30,6 +32,11 @@ int main(int c, char *v[])
 
     // Create parser
     Parser p(g);
+
+#ifdef DEBUG
+    p.graphviz("main.dot");
+    system("dot -Tpng main.dot -o main.png");
+#endif
 
     // Initialize lexer on source file
     l.init_file(source_path);

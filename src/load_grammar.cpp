@@ -43,7 +43,7 @@ Grammar load_grammar(const std::list<Token> &_text,
             cur_rule = t.str;
             is_in_rule = true;
 
-            if (g.entry_rule == "")
+            if (g.entry_rule == "" || cur_rule == "MAIN")
             {
                 g.entry_rule = cur_rule;
             }

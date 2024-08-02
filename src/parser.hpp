@@ -39,6 +39,8 @@ class Parser
     void process_token(const Token &_what) noexcept;
 
     int n_viable() const noexcept;
+    const std::set<Cursor> get_cursors() const noexcept;
+
     Cursor finalize();
 
     void graphviz(const std::string &_filepath) const noexcept;

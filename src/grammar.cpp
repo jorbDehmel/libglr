@@ -31,6 +31,14 @@ GrammarGraph::GrammarGraph(const Grammar &_g)
         // Write rule from beginning to end
         for (auto node : rule)
         {
+            if (cur_end == root && !node.is_terminal(contents))
+            {
+                throw std::runtime_error(std::format(
+                    "Rule '{}' has one or more branches "
+                    "beginning with non-terminal.",
+                    name));
+            }
+
             if (node.is_rule_name(contents))
             {
                 if (!rule_handles.contains(contents))

@@ -32,7 +32,7 @@ class RuleNode
     {
     }
 
-    inline bool is_terminal(std::string &_into)
+    inline bool is_terminal(std::string &_into) const
     {
         if (type == TERMINAL)
         {
@@ -42,7 +42,7 @@ class RuleNode
         return false;
     }
 
-    inline bool is_rule_name(std::string &_into)
+    inline bool is_rule_name(std::string &_into) const
     {
         if (type == RULE_NAME)
         {
@@ -52,7 +52,7 @@ class RuleNode
         return false;
     }
 
-    inline bool is_disjunction()
+    inline bool is_disjunction() const
     {
         return type == DISJUNCTION;
     }
@@ -83,7 +83,7 @@ differently.
 class Grammar
 {
   public:
-    std::string entry_rule = "MAIN";
+    std::string entry_rule;
     std::map<std::string, Rule> rules;
 };
 

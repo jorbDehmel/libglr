@@ -1,9 +1,12 @@
-TARGETS := cursor grammar lexer node parser load_grammar
+EXES := test_cursor.out test_grammar.out test_lexer.out \
+	test_load_grammar.out test_node.out test_parser_2.out \
+	test_parser_3.out test_parser.out
+
 CC := g++ -g -O3 -std=c++20
 CFLAGS := -pedantic -Wall
 LFLAGS := -pedantic -Wall
 
-EXES := $(TARGETS:%=test_%.out)
+TARGETS := cursor grammar lexer node parser load_grammar
 OBJS := $(TARGETS:%=../build/%.o)
 HEADS := $(TARGETS:%=../src/%.hpp)
 
