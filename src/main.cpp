@@ -2,8 +2,6 @@
 Basic CLI frontend for parser testing.
 */
 
-#define DEBUG
-
 #include "cursor.hpp"
 #include "lexer.hpp"
 #include "load_grammar.hpp"
