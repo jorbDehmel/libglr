@@ -74,6 +74,8 @@ int main()
 
 ```
 
+This should be linked with the `-Lglr` flag.
+
 ## Testing
 
 To run the unit tests, run `make test`.
